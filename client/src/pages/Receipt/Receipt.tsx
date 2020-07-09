@@ -12,6 +12,14 @@ import { CartItem } from "src/interfaces";
 import Page from "src/pages/Page";
 import Header from "src/components/Header";
 import CartSummary from "src/components/CartSummary";
+import {
+  GST_PERCENTAGE,
+  priceSumArray,
+  priceGetGST,
+  priceSum,
+  priceMul,
+} from "src/priceLibrary";
+import { microapps, isWeb } from "src/config";
 declare const window: any;
 
 const Receipt: React.FC<RouteComponentProps> = ({ history }) => {
@@ -33,11 +41,68 @@ const Receipt: React.FC<RouteComponentProps> = ({ history }) => {
     }
   }, [paymentStatus]);
 
+  const makeFakeOrder = (contents: CartItem[]) => {
+    const cartSubtotal = priceSumArray(
+      contents && contents.length
+        ? contents.map((cartItem: CartItem) =>
+            priceMul(cartItem.item.price, cartItem.quantity)
+          )
+        : []
+    );
+    const curDay: number = new Date().getDay();
+    const curMonth: number = new Date().getMonth();
+    const curNow: number = Date.now();
+    const curDateString = `order on: ${curDay}/${curMonth}`;
+    const curOrderId = `paymentTemp-${curNow}`;
+    const cartGST = priceGetGST(cartSubtotal);
+    const cartTotal = priceSum(cartSubtotal, cartGST);
+    const orderTemplate = {
+      title: "ScanAndGo: Fairprice Purchase",
+      subtitle: curDateString,
+      imageUrl: "https://placekitten.com/200/200",
+
+      items: contents.map((cartItem: CartItem) => ({
+        title: cartItem.item.name,
+        quantity: cartItem.quantity,
+        price: {
+          currency: "SGD",
+          value: cartItem.item.price,
+        },
+      })),
+
+      total: {
+        currency: "SGD",
+        value: cartTotal,
+      },
+
+      status: {
+        type: "COMPLETED",
+        label: "Your Groceries are ready to go!",
+      },
+
+      actions: [
+        {
+          label: "CONTINUE",
+          url: "https://microapps.google.com/1971992074819089602",
+        },
+      ],
+
+      orderId: curOrderId,
+    };
+    if (!isWeb) {
+      microapps.createOrder(orderTemplate);
+    } else {
+      console.log("Attempting Order:");
+      console.log(orderTemplate);
+    }
+  };
+
   const makePayment = () => {
     verify();
     // TODO (#50): Replace timeout mock with actual payflow
     setTimeout(() => {
       setPaymentStatus(PAYMENT_STATUS.SUCCESS);
+      makeFakeOrder(contents);
     }, 3000);
   };
 
