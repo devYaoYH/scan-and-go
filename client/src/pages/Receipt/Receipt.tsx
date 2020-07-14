@@ -4,7 +4,11 @@ import Cart from "src/components/Cart";
 import { urlGetParam } from "src/utils";
 import { Button, Typography, Grid } from "@material-ui/core";
 import QRCode from "qrcode";
-import { HOME_PAGE, PAYMENT_STATUS } from "src/constants";
+import {
+  HOME_PAGE,
+  PAYMENT_STATUS,
+  PRICE_FRACTION_DIGITS,
+} from "src/constants";
 import { AlertContext } from "src/contexts/AlertContext";
 import "src/css/Receipt.css";
 import "src/css/animation.css";
@@ -66,13 +70,13 @@ const Receipt: React.FC<RouteComponentProps> = ({ history }) => {
         quantity: cartItem.quantity,
         price: {
           currency: "SGD",
-          value: cartItem.item.price,
+          value: cartItem.item.price.toFixed(PRICE_FRACTION_DIGITS),
         },
       })),
 
       total: {
         currency: "SGD",
-        value: cartTotal,
+        value: cartTotal.toFixed(PRICE_FRACTION_DIGITS),
       },
 
       status: {

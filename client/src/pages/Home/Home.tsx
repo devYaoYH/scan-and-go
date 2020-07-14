@@ -84,6 +84,7 @@ function Home(props: any) {
     // Try to extract store-id and merchant-id fields from storeUrl
     const storeId = parseUrlParam(storeUrl, "id"); //TODO(#167) Replace with constants for "id"/"mid"
     const merchantId = parseUrlParam(storeUrl, "mid");
+    console.log(`url: ${storeUrl} | id=${storeId}, mid=${merchantId}`);
     // If valid extraction, push us to new site
     if (storeId && merchantId) {
       history.push(getStoreRedirectUrl(storeId, merchantId));

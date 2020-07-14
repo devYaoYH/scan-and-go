@@ -222,6 +222,8 @@ export const deepHtmlStringMatch = (element: any, match: string) => {
 
 // Given a HTML img element, process image data for barcode string
 export const processImageBarcode = async (img: HTMLImageElement) => {
+  console.log("Processing img:");
+  console.log(img);
   const codeReader = new BrowserMultiFormatReader();
   if (img) {
     const result = await codeReader
@@ -230,6 +232,8 @@ export const processImageBarcode = async (img: HTMLImageElement) => {
       .catch((err: any) => console.error(err));
     if (result) {
       return result;
+    } else {
+      console.error("No Barcode Found");
     }
   }
   return false;
